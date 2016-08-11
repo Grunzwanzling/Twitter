@@ -20,6 +20,7 @@ import javax.imageio.ImageIO;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 
@@ -34,15 +35,25 @@ public class LotD2 {
 			.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 	static Random rand = new Random();
 
-	public static void main(String args[]) throws Exception {
+	public static void main(String args[]) {
+		try {
+			createPost();
+		} catch (IOException | TwitterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private static void createPost() throws IOException, TwitterException {
 		char c = (char) (rand.nextInt(26) + 'A');
 		generateImage(c);
-		// The factory instance is re-useable and thread safe.
+		// The factory instance is re-usable and thread safe.
 		TwitterFactory factory = new TwitterFactory();
-		AccessToken accessToken = loadAccessToken();
+		AccessToken accessToken = loadAccessToken("lotd");
 		Twitter twitter = factory.getInstance();
 		twitter.setOAuthAccessToken(accessToken);
-		StatusUpdate statusUpdate = new StatusUpdate("API-Test4");
+		StatusUpdate statusUpdate = new StatusUpdate(
+				"The letter of the day is: " + c);
 		statusUpdate.setMedia(new File("C://twitter//image.png"));
 		Status status = twitter.updateStatus(statusUpdate);
 		System.out.println("Successfully updated the status to ["
@@ -127,15 +138,15 @@ public class LotD2 {
 
 	}
 
-	private static AccessToken loadAccessToken() {
+	private static AccessToken loadAccessToken(String id) {
 		Properties prop = new Properties();
 		InputStream in;
 		try {
 			in = new FileInputStream(new File("C://twitter//token.txt"));
 
 			prop.load(in);
-			String token = prop.getProperty("token");
-			String tokenSecret = prop.getProperty("tokenSecret");
+			String token = prop.getProperty(id + ".token");
+			String tokenSecret = prop.getProperty(id + ".tokenSecret");
 			return new AccessToken(token, tokenSecret);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
