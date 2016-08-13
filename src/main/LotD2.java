@@ -12,6 +12,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 
@@ -34,13 +38,32 @@ public class LotD2 {
 	static String[] fontNames = GraphicsEnvironment
 			.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 	static Random rand = new Random();
+	static DateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
 	public static void main(String args[]) {
-		try {
-			createPost();
-		} catch (IOException | TwitterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		loop();
+	}
+
+	private static void loop() {
+
+		while (true) {
+			Date d = new Date();
+			System.out.println(dateFormat.format(d));
+			if (dateFormat.format(d).equals("19:00")) {
+				try {
+					createPost();
+					System.out.println("Created post");
+					Thread.sleep(120000);
+				} catch (InterruptedException | IOException | TwitterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -58,7 +81,6 @@ public class LotD2 {
 		Status status = twitter.updateStatus(statusUpdate);
 		System.out.println("Successfully updated the status to ["
 				+ status.getText() + "].");
-		System.exit(0);
 	}
 
 	private static void generateImage(char c) throws IOException {
@@ -109,20 +131,8 @@ public class LotD2 {
 				t1 = System.currentTimeMillis() - time + t1;
 				break;
 			case 2:
-				time = System.currentTimeMillis();
-				g.drawString(String.valueOf(c), x, y);
-				t2 = System.currentTimeMillis() - time + t2;
-				break;
 			case 3:
-				time = System.currentTimeMillis();
-				g.drawString(String.valueOf(c), x, y);
-				t2 = System.currentTimeMillis() - time + t2;
-				break;
 			case 4:
-				time = System.currentTimeMillis();
-				g.drawString(String.valueOf(c), x, y);
-				t2 = System.currentTimeMillis() - time + t2;
-				break;
 			case 5:
 				time = System.currentTimeMillis();
 				g.drawString(String.valueOf(c), x, y);
