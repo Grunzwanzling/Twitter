@@ -58,8 +58,10 @@ public class LotD {
 				}
 			}
 		}
+		System.out.println(accessToken.getToken());
+		System.out.println(accessToken.getTokenSecret());
 		// persist to the accessToken for future reference.
-		storeAccessToken("lotd", accessToken);
+		// storeAccessToken("lotd", accessToken);
 		// Status status = twitter.updateStatus("API-Test");
 		// System.out.println("Successfully updated the status to ["
 		// + status.getText() + "].");
