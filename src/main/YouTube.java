@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -25,6 +28,7 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import essentials.Essentials;
+import essentials.SimpleLog;
 
 /**
  * @author Maximilian
@@ -36,6 +40,14 @@ public class YouTube {
 	static long i;
 
 	static Random rand = new Random();
+	static String[] congratulations;
+	static SimpleLog log;
+
+	static TwitterFactory factory;
+	static AccessToken accessToken;
+	static Twitter twitter;
+
+	static DateFormat dateFormat = new SimpleDateFormat("mm");
 
 	public YouTube() {
 		// TODO Auto-generated constructor stub
@@ -57,54 +69,52 @@ public class YouTube {
 			if (!list.contains(string))
 				list.add(string);
 		}
-		System.out.println(list.size());
 		return list;
 	}
 
-	/**
-	 * @param args
-	 * @throws IOException
-	 * @throws MalformedURLException
-	 * @throws TwitterException
-	 */
-	public static void main(String[] args) throws MalformedURLException,
-			IOException, TwitterException {
-
-		System.exit(0);
-
-		ArrayList<String> list = getChannelsToCheck();
-		int i = 0;
-		String channels[] = new String[getChannelsToCheck().size()];
-		for (Object object : list) {
-			channels[i] = (String) object;
-			i++;
-		}
-		Properties props = new Properties();
-		props.load(new FileInputStream(new File(
-				"C:\\twitter\\Aboerfolge\\subs.properties")));
-		for (String channel : channels) {
-
-			String subs = round(getSubs(channel));
-
-			if (!props.containsKey(channel)) {
-				props.setProperty(channel, subs);
-				continue;
+	private static void check() {
+		try {
+			log.info("Checking for events");
+			long time = System.currentTimeMillis();
+			ArrayList<String> list = getChannelsToCheck();
+			int i = 0;
+			String channels[] = new String[getChannelsToCheck().size()];
+			for (Object object : list) {
+				channels[i] = (String) object;
+				i++;
 			}
-			if (!props.getProperty(channel).equals(subs)) {
-				createPost(channel, subs);
-				props.setProperty(channel, subs);
+			Properties props = new Properties();
+			props.load(new FileInputStream(new File(
+					"C:\\twitter\\Aboerfolge\\subs.properties")));
+			for (String channel : channels) {
+				String subs = round(getSubs(channel));
+
+				if (!props.containsKey(channel)) {
+					log.info("Found a new channel \"" + channel + "\"");
+					props.setProperty(channel, subs);
+					continue;
+				}
+				if (!props.getProperty(channel).equals(subs)) {
+					log.info("Found a event on channel \"" + channel + "\"");
+					createPost(channel, subs);
+					props.setProperty(channel, subs);
+
+				}
+				// else
+				// System.out.println(string + " still has "
+				// + round(getSubs(string)));
 
 			}
-			// else
-			// System.out.println(string + " still has "
-			// + round(getSubs(string)));
+			props.store(new FileOutputStream(new File(
+					"C://twitter//Aboerfolge//subs.properties")), "");
 
+			log.info("Checked " + channels.length + " channels in "
+					+ (System.currentTimeMillis() - time) + " ms");
+
+		} catch (IOException e) {
+			log.error("Error occured while checking");
+			log.logStackTrace(e);
 		}
-		props.store(new FileOutputStream(new File(
-				"C://twitter//subs.properties")), "");
-
-		System.out.println(t / i);
-
 	}
 
 	private static String round(String subs) {
@@ -119,85 +129,106 @@ public class YouTube {
 		}
 	}
 
-	private static void createPost(String username, String subs)
-			throws IOException, TwitterException {
+	private static void createPost(String username, String subs) {
+		try {
+			// Generate the message
+			int index = new Random().nextInt(congratulations.length);
+			String message = congratulations[index];
+			message = message.replaceAll("@user", username);
+			message = message.replaceAll("@title", getTitle(username));
+			message = message.replaceAll("@subs", subs);
 
-		// Generate the message
-		String[] congratulations = getCongratulations();
-		int index = new Random().nextInt(congratulations.length);
-		String message = congratulations[index];
-		message = message.replaceAll("@user", username);
-		message = message.replaceAll("@title", getTitle(username));
-		message = message.replaceAll("@subs", subs);
-
-		// Connecting to Twitter
-
-		TwitterFactory factory = new TwitterFactory();
-		AccessToken accessToken = loadAccessToken("abos");
-		Twitter twitter = factory.getInstance();
-		twitter.setOAuthAccessToken(accessToken);
-		StatusUpdate statusUpdate = new StatusUpdate(message);
-		Status status = twitter.updateStatus(statusUpdate);
-		System.out.println("Successfully updated the status to ["
-				+ status.getText() + "].");
+			StatusUpdate statusUpdate = new StatusUpdate(message);
+			Status status = twitter.updateStatus(statusUpdate);
+			log.info("Successfully updated the status to [" + status.getText()
+					+ "].");
+		} catch (TwitterException e) {
+			log.error("Error occured while creating Post");
+			log.logStackTrace(e);
+		}
 	}
 
-	private static String[] getCongratulations() throws IOException {
-		BufferedReader bufr = new BufferedReader(new FileReader(new File(
-				"C://twitter//Aboerfolge//congratulations.txt")));
-		ArrayList<String> list = new ArrayList<String>();
-		String line = bufr.readLine();
-		while (line != "") {
-			list.add(line);
-			line = bufr.readLine();
+	private static String[] getCongratulations() {
+		try {
+			BufferedReader bufr = new BufferedReader(new FileReader(new File(
+					"C://twitter//Aboerfolge//congratulations.txt")));
+			ArrayList<String> list = new ArrayList<String>();
+			String line = bufr.readLine();
+			while (line != null) {
+				list.add(line);
+				line = bufr.readLine();
+			}
+			bufr.close();
+			String[] congratulations = new String[list.size()];
+			for (int i = 0; i < list.size(); i++)
+				congratulations[i] = list.get(i);
+		} catch (IOException e) {
+			log.error("Error occured while getting congratulations");
+			log.logStackTrace(e);
 		}
-		bufr.close();
-		String[] congratulations = new String[list.size()];
-		for (int i = 0; i < list.size(); i++)
-			congratulations[i] = list.get(i);
 		return congratulations;
 
 	}
 
-	private static String[] getTopYouTubers() throws MalformedURLException,
-			IOException {
-		String result = Essentials
-				.sendHTTPRequest(new URL(
-						"http://socialblade.com/youtube/top/country/de/mostsubscribed"));
-		String channel = "d";
-		int index = 0;
-		String channels[] = new String[100];
-		for (int i = 0; i < 100; i++) {
-			index = result.indexOf("<a href=\"/youtube/user/", index) + 23;
-			int newIndex = result.indexOf("\"", index);
-			channel = result.substring(index, newIndex);
-			channels[i] = channel;
-			index = newIndex;
+	private static String[] getTopYouTubers() {
+		try {
+			String result = Essentials
+					.sendHTTPRequest(new URL(
+							"http://socialblade.com/youtube/top/country/de/mostsubscribed"));
+			String channel = "d";
+			int index = 0;
+			String channels[] = new String[100];
+			for (int i = 0; i < 100; i++) {
+				index = result.indexOf("<a href=\"/youtube/user/", index) + 23;
+				int newIndex = result.indexOf("\"", index);
+				channel = result.substring(index, newIndex);
+				channels[i] = channel;
+				index = newIndex;
+			}
+			return channels;
+		} catch (IOException e) {
+			log.error("Error occured while getting top Youtubers");
+			log.logStackTrace(e);
+			return null;
 		}
-		return channels;
+
 	}
 
-	private static String getSubs(String username)
-			throws MalformedURLException, IOException {
-		i++;
-		long time = System.currentTimeMillis();
-		String result = Essentials.sendHTTPRequest(new URL(
-				"https://www.googleapis.com/youtube/v3/channels?part=statistics&forUsername="
-						+ username
-						+ "&key=AIzaSyCJc0FXy-09W07N0OPlMiHezPsCdNrX0mY"));
-		t += (System.currentTimeMillis() - time);
-		return result.substring(result.indexOf("subscriberCount") + 19,
-				result.indexOf("\"", result.indexOf("subscriberCount") + 19));
+	private static String getSubs(String username) {
+		try {
+			i++;
+			long time = System.currentTimeMillis();
+			String result = Essentials.sendHTTPRequest(new URL(
+					"https://www.googleapis.com/youtube/v3/channels?part=statistics&forUsername="
+							+ username
+							+ "&key=AIzaSyCJc0FXy-09W07N0OPlMiHezPsCdNrX0mY"));
+			t += (System.currentTimeMillis() - time);
+			return result
+					.substring(
+							result.indexOf("subscriberCount") + 19,
+							result.indexOf("\"",
+									result.indexOf("subscriberCount") + 19));
+		} catch (IOException e) {
+			log.error("Error occured while getting subscribers of " + username);
+			log.logStackTrace(e);
+			return null;
+		}
 	}
 
-	private static String getTitle(String username)
-			throws MalformedURLException, IOException {
-		String result = Essentials.sendHTTPRequest(new URL(
-				"https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername="
-						+ username
-						+ "&key=AIzaSyCJc0FXy-09W07N0OPlMiHezPsCdNrX0mY"));
-		return result.substring(result.indexOf("title") + 9,
-				result.indexOf("\"", result.indexOf("title") + 9));
+	private static String getTitle(String username) {
+		try {
+			String result = Essentials.sendHTTPRequest(new URL(
+					"https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername="
+							+ username
+							+ "&key=AIzaSyCJc0FXy-09W07N0OPlMiHezPsCdNrX0mY"));
+			return result.substring(result.indexOf("title") + 9,
+					result.indexOf("\"", result.indexOf("title") + 9));
+		} catch (IOException e) {
+			log.error("Error occured while getting title of " + username);
+			log.logStackTrace(e);
+			return null;
+		}
+
 	}
 
 	private static AccessToken loadAccessToken(String id) {
@@ -215,5 +246,33 @@ public class YouTube {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * @param args
+	 * @throws InterruptedException
+	 */
+	public static void main(String[] args) throws InterruptedException {
+		log = new SimpleLog(new File("C://twitter//Aboerfolge//log.txt"), true,
+				true);
+		log.startupMessage("Starting Aboerfolg-Bot...");
+		congratulations = getCongratulations();
+
+		// Connecting to Twitter API
+		factory = new TwitterFactory();
+		accessToken = loadAccessToken("abos");
+		twitter = factory.getInstance();
+		twitter.setOAuthAccessToken(accessToken);
+		log.info("Successfully loaded congratulations and connected to Twitter");
+
+		while (true) {
+			Date d = new Date();
+			if (dateFormat.format(d).endsWith("0")) {
+
+				check();
+				Thread.sleep(61000);
+			}
+
+		}
 	}
 }
