@@ -253,8 +253,10 @@ public class YouTube {
 		try {
 			String result = Essentials.sendHTTPRequest(new URL(
 					"https://www.youtube.com/user/" + username + "/about"));
-			return result.substring(result.indexOf("twitter.com/") + 12,
-					result.indexOf("\"", result.indexOf("twitter.com/") + 12));
+			return "@"
+					+ result.substring(result.indexOf("twitter.com/") + 12,
+							result.indexOf("\"",
+									result.indexOf("twitter.com/") + 12));
 		} catch (IOException e) {
 			log.error("Error occured while getting the Twitter name of "
 					+ username);
