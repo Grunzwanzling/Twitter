@@ -97,9 +97,9 @@ public class YouTube {
 					log.info("Found a event on channel \"" + channel + "\"");
 					String twitter = getTwitterName(channel);
 					if (twitter != null)
-						createPost(twitter, subs);
+						createPost(channel, subs, twitter);
 					else
-						createPost(channel, subs);
+						createPost(channel, subs, getTitle(channel));
 					props.setProperty(channel, subs);
 
 				}
@@ -132,13 +132,15 @@ public class YouTube {
 		}
 	}
 
-	private static void createPost(String username, String subs) {
+	private static void createPost(String username, String subs, String title) {
 		try {
+			System.out.println(username);
+			System.out.println(title);
 			// Generate the message
 			int index = new Random().nextInt(congratulations.length);
 			String message = congratulations[index];
 			message = message.replaceAll("@user", username);
-			message = message.replaceAll("@title", getTitle(username));
+			message = message.replaceAll("@title", title);
 			message = message.replaceAll("@subs", subs);
 
 			StatusUpdate statusUpdate = new StatusUpdate(message);
@@ -251,8 +253,12 @@ public class YouTube {
 
 	private static String getTwitterName(String username) {
 		try {
+
 			String result = Essentials.sendHTTPRequest(new URL(
 					"https://www.youtube.com/user/" + username + "/about"));
+			if (result.indexOf("twitter.com/") == -1)
+				return null;
+
 			return "@"
 					+ result.substring(result.indexOf("twitter.com/") + 12,
 							result.indexOf("\"",
@@ -284,11 +290,11 @@ public class YouTube {
 
 		while (true) {
 			Date d = new Date();
-			if (dateFormat.format(d).endsWith("0")) {
+			// if (dateFormat.format(d).endsWith("0")) {
 
-				check();
-				Thread.sleep(61000);
-			}
+			check();
+			Thread.sleep(61000);
+			// }
 
 		}
 	}
