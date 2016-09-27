@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,7 +34,7 @@ import essentials.SimpleLog;
  * @author Maximilian
  *
  */
-public class YouTube {
+public class YouTube2 {
 
 	static long t;
 	static long i;
@@ -48,7 +49,7 @@ public class YouTube {
 
 	static DateFormat dateFormat = new SimpleDateFormat("mm");
 
-	public YouTube() {
+	public YouTube2() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -95,11 +96,7 @@ public class YouTube {
 				}
 				if (!props.getProperty(channel).equals(subs)) {
 					log.info("Found a event on channel \"" + channel + "\"");
-					String twitter = getTwitterName(channel);
-					if (twitter != null)
-						createPost(twitter, subs);
-					else
-						createPost(channel, subs);
+					createPost(channel, subs);
 					props.setProperty(channel, subs);
 
 				}
@@ -162,7 +159,7 @@ public class YouTube {
 				line = bufr.readLine();
 			}
 			bufr.close();
-			congratulations = new String[list.size()];
+			String[] congratulations = new String[list.size()];
 			for (int i = 0; i < list.size(); i++)
 				congratulations[i] = list.get(i);
 		} catch (IOException e) {
@@ -268,6 +265,8 @@ public class YouTube {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
+		System.out.println(getTwitterName("SpaceFrogsEnt"));
+
 		log = new SimpleLog(new File("C://twitter//Aboerfolge//log.txt"), true,
 				true);
 		log.startupMessage("Starting Aboerfolg-Bot...");
