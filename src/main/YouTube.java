@@ -87,7 +87,7 @@ public class YouTube {
 					"C:\\twitter\\Aboerfolge\\subs.properties")));
 			for (String channel : channels) {
 				String subs = round(getSubs(channel));
-
+				System.out.println(channel);
 				if (!props.containsKey(channel)) {
 					log.info("Found a new channel \"" + channel + "\"");
 					props.setProperty(channel, subs);
@@ -95,12 +95,14 @@ public class YouTube {
 				}
 				if (!props.getProperty(channel).equals(subs)) {
 					log.info("Found a event on channel \"" + channel + "\"");
-					String twitter = getTwitterName(channel);
-					if (twitter != null)
-						createPost(channel, subs, twitter);
-					else
-						createPost(channel, subs, getTitle(channel));
-					props.setProperty(channel, subs);
+					if (!subs.equals("0")) {
+						String twitter = getTwitterName(channel);
+						if (twitter != null)
+							createPost(channel, subs, twitter);
+						else
+							createPost(channel, subs, getTitle(channel));
+						props.setProperty(channel, subs);
+					}
 
 				}
 				// else
@@ -290,11 +292,11 @@ public class YouTube {
 
 		while (true) {
 			Date d = new Date();
-			// if (dateFormat.format(d).endsWith("0")) {
+			if (dateFormat.format(d).endsWith("0")) {
 
-			check();
-			Thread.sleep(61000);
-			// }
+				check();
+				Thread.sleep(61000);
+			}
 
 		}
 	}
