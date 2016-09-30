@@ -87,7 +87,7 @@ public class YouTube {
 					"C:\\twitter\\Aboerfolge\\subs.properties")));
 			for (String channel : channels) {
 				String subs = round(getSubs(channel));
-				System.out.println(channel);
+				Thread.sleep(20);
 				if (!props.containsKey(channel)) {
 					log.info("Found a new channel \"" + channel + "\"");
 					props.setProperty(channel, subs);
@@ -116,7 +116,7 @@ public class YouTube {
 			log.info("Checked " + channels.length + " channels in "
 					+ (System.currentTimeMillis() - time) + " ms");
 
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			log.error("Error occured while checking");
 			log.logStackTrace(e);
 		}
