@@ -35,6 +35,11 @@ import essentials.SimpleLog;
  */
 public class YouTube {
 
+	static String path;
+	static String name;
+	static String congrats;
+	static String tokenID;
+
 	static long t;
 	static long i;
 
