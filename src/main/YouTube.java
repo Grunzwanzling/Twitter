@@ -86,7 +86,7 @@ public class YouTube {
 					props.getProperty("name"),
 					props.getProperty("url"),
 					props.getProperty("location"),
-					props.getProperty("bio").replaceAll("count",
+					props.getProperty("bio").replaceAll("@count",
 							String.valueOf(count)));
 		} catch (TwitterException | IOException e) {
 			// TODO Auto-generated catch block
@@ -174,7 +174,7 @@ public class YouTube {
 			// System.out.println(subs);
 			int sub = Integer.parseInt(subs);
 			int down = sub / 100000;
-			if (sub > 10000000) {
+			if (sub > 3000000) {
 				down = down / 10;
 				down = down * 10;
 			}
