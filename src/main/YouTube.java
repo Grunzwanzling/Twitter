@@ -174,6 +174,10 @@ public class YouTube {
 			// System.out.println(subs);
 			int sub = Integer.parseInt(subs);
 			int down = sub / 100000;
+			if (sub > 10000000) {
+				down = down / 10;
+				down = down * 10;
+			}
 
 			return String.valueOf(nf.format(down * 100000));
 		} catch (NumberFormatException e) {
