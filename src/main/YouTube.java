@@ -111,10 +111,11 @@ public class YouTube {
 			if (path.contains("500"))
 				size = 500;
 			ArrayList<String> top = getTopYouTubers(path, size);
-			for (String string : top) {
-				if (!list.contains(string))
-					list.add(string);
-			}
+			if (top != null)
+				for (String string : top) {
+					if (!list.contains(string))
+						list.add(string);
+				}
 		}
 		System.out.println(System.currentTimeMillis() - time);
 
@@ -134,7 +135,7 @@ public class YouTube {
 			}
 			Properties props = new Properties();
 			props.load(new FileInputStream(new File(path)));
-			for (String channel : channels) {
+			a: for (String channel : channels) {
 				String subs = round(getSubs(channel));
 				Thread.sleep(20);
 				if (!props.containsKey(channel)) {
@@ -142,17 +143,24 @@ public class YouTube {
 					props.setProperty(channel, subs);
 					continue;
 				}
-				if (!props.getProperty(channel).equals(subs)) {
-					log.info("Found a event on channel \"" + channel + "\"");
-					if (!subs.equals("0")) {
-						String twitter = getTwitterName(channel);
-						if (twitter != null)
-							createPost(channel, subs, twitter);
-						else
-							createPost(channel, subs, getTitle(channel));
-						props.setProperty(channel, subs);
-					}
+				try {
+					if (Integer.parseInt(props.getProperty(channel).replaceAll(
+							"\\.", "")) < Integer.parseInt(subs.replaceAll(
+							"\\.", ""))) {
+						log.info("Found a event on channel \"" + channel + "\"");
+						if (!subs.equals("0")) {
+							String twitter = getTwitterName(channel);
+							if (twitter != null)
+								createPost(channel, subs, twitter);
+							else
+								createPost(channel, subs, getTitle(channel));
+							props.setProperty(channel, subs);
+							break a;
+						}
 
+					}
+				} catch (NumberFormatException e) {
+					log.warning("Couldn't find " + channel);
 				}
 				// else
 				// System.out.println(string + " still has "
