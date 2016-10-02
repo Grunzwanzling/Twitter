@@ -3,6 +3,7 @@
  */
 package main;
 
+import java.awt.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -104,16 +105,18 @@ public class YouTube {
 		for (Object object : s) {
 			list.add((String) object);
 		}
+		long time = System.currentTimeMillis();
 		for (String path : paths) {
 			int size = 100;
 			if (path.contains("500"))
 				size = 500;
-			String[] top = getTopYouTubers(path, size);
+			ArrayList<String> top = getTopYouTubers(path, size);
 			for (String string : top) {
 				if (!list.contains(string))
 					list.add(string);
 			}
 		}
+		System.out.println(System.currentTimeMillis() - time);
 
 		return list;
 	}
@@ -228,17 +231,17 @@ public class YouTube {
 
 	}
 
-	private String[] getTopYouTubers(String topURL, int size) {
+	private ArrayList<String> getTopYouTubers(String topURL, int size) {
 		try {
 			String result = Essentials.sendHTTPRequest(new URL(topURL));
 			String channel = "d";
 			int index = 0;
-			String channels[] = new String[size];
+			ArrayList<String> channels = new ArrayList<String>();
 			for (int i = 0; i < size; i++) {
 				index = result.indexOf("<a href=\"/youtube/user/", index) + 23;
 				int newIndex = result.indexOf("\"", index);
 				channel = result.substring(index, newIndex);
-				channels[i] = channel;
+				channels.add(channel);
 				index = newIndex;
 			}
 			return channels;
@@ -348,13 +351,13 @@ public class YouTube {
 
 		while (true) {
 			Date d = new Date();
-			if (dateFormat.format(d).endsWith("0")) {
+			 if (dateFormat.format(d).endsWith("0")) {
 
-				yt.updateProfile(yt.check());
-				yt2.updateProfile(yt2.check());
-				Thread.sleep(61000);
-			}
-
+			yt.updateProfile(yt.check());
+			yt2.updateProfile(yt2.check());
+			Thread.sleep(61000);
 		}
+
+		 }
 	}
 }
