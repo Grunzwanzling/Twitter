@@ -154,8 +154,11 @@ public class YouTube {
 								createPost(channel, subs, twitter);
 							else
 								createPost(channel, subs, getTitle(channel));
+
 							props.setProperty(channel, subs);
-							break a;
+							props.store(new FileOutputStream(new File(path)),
+									"");
+							return 0;
 						}
 
 					}
@@ -359,13 +362,23 @@ public class YouTube {
 
 		while (true) {
 			Date d = new Date();
-			 if (dateFormat.format(d).endsWith("0")) {
+			if (dateFormat.format(d).endsWith("0")) {
 
-			yt.updateProfile(yt.check());
-			yt2.updateProfile(yt2.check());
-			Thread.sleep(61000);
+				int returnValue;
+				returnValue = yt.check();
+				if (returnValue == 0)
+					Thread.sleep(1200000);
+				else
+					yt.updateProfile(returnValue);
+
+				returnValue = yt2.check();
+				if (returnValue == 0)
+					Thread.sleep(1200000);
+				else
+					yt2.updateProfile(returnValue);
+				Thread.sleep(61000);
+			}
+
 		}
-
-		 }
 	}
 }

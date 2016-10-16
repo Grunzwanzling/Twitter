@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
 import twitter4j.Query;
@@ -30,13 +31,29 @@ public class WelcomeOnTwitter {
 		AccessToken accessToken = loadAccessToken("abos");
 		twitter = factory.getInstance();
 		twitter.setOAuthAccessToken(accessToken);
+		check();
+	}
 
-		Query query = new Query("#meinErsterTweet");
-		QueryResult result = twitter.search(query);
-		for (Status status : result.getTweets()) {
-			System.out.println("@" + status.getUser().getScreenName() + ":"
-					+ status.getText());
-			System.out.println(status.getId());
+	private void check() {
+		try {
+			Query query = new Query("#meinErsterTweet");
+			QueryResult result;
+
+			result = twitter.search(query);
+
+			List<Status> statusList = result.getTweets();
+
+			for (Status status : statusList) {
+				System.out.println("@" + status.getUser().getScreenName() + ":"
+						+ status.getText());
+				System.out.println(status.getId());
+			}
+			// for (int i = statusList.size(); i >= 0; i--) {
+			twitter.createFavorite(statusList.get(1).getId());
+			// }
+		} catch (TwitterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
