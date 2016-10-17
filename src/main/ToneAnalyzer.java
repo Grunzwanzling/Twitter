@@ -84,7 +84,7 @@ public class ToneAnalyzer {
 				i5 = i;
 			}
 		}
-		int[] result = { i1, i2, i3 };
+		int[] result = { i1, i2, i3, i4, i5 };
 		return result;
 	}
 
@@ -97,36 +97,55 @@ public class ToneAnalyzer {
 		AccessToken accessToken = loadAccessToken("abos");
 		twitter = factory.getInstance();
 		twitter.setOAuthAccessToken(accessToken);
-		float[] t = check("#HillaryBecause");
-		System.out.println("#HillaryBecause");
-		for (int i : topFive(t)) {
-			System.out.println(tone_ids[i] + " " + t[i]);
+
+		int iterations = 5;
+
+		List<Status> tweets = getTweets("#Hecking", 20 * iterations);
+		float[] scores = new float[13];
+		for (int i = 0; i < iterations; i++) {
+			System.out.println(i);
+			String text = "";
+			for (int e = i * 20; e < i * 20 + 20; e++) {
+				text = text + tweets.get(e).getText();
+			}
+			float[] score = check(URLEncoder.encode(text));
+			for (int u = 0; u < 13; u++) {
+				scores[u] += score[u];
+			}
+
+		}
+		for (int u = 0; u < 13; u++) {
+			scores[u] = scores[u] / iterations;
+		}
+
+		System.out.println("#Hecking");
+		for (int i : topFive(scores)) {
+			System.out.println(tone_ids[i] + " " + (int) (scores[i] * 100)
+					+ "%");
 		}
 	}
 
-	private float[] check(String hashtag) throws IOException {
+	private List<Status> getTweets(String topic, int count)
+			throws TwitterException {
+		Query query = new Query(topic);
+		QueryResult result;
+		query.setCount(count);
+		result = twitter.search(query);
+
+		return result.getTweets();
+	}
+
+	private float[] check(String text) throws IOException {
 		float[] scores = new float[13];
-		try {
-			Query query = new Query(hashtag);
-			QueryResult result;
-			query.setCount(1);
-			result = twitter.search(query);
 
-			List<Status> statusList = result.getTweets();
-			String text = "";
-			for (Status status : statusList) {
+		// System.out.println(text);
+		System.out.println(text.length());
+		System.out.println(text);
+		scores = analyzeTone(text.replace("\n", ""));
+		// for (int i = statusList.size(); i >= 0; i--) {
+		// twitter.createFavorite(statusList.get(1).getId());
+		// }
 
-				text = text + status.getText() + "\n";
-			}
-			// System.out.println(text);
-			scores = analyzeTone(text);
-			// for (int i = statusList.size(); i >= 0; i--) {
-			// twitter.createFavorite(statusList.get(1).getId());
-			// }
-		} catch (TwitterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return scores;
 	}
 
