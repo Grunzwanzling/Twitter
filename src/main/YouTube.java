@@ -150,12 +150,14 @@ public class YouTube {
 						log.info("Found a event on channel \"" + channel + "\"");
 						if (!subs.equals("0")) {
 							String twitter = getTwitterName(channel);
+							boolean success = false;
 							if (twitter != null)
-								createPost(channel, subs, twitter);
+								success = createPost(channel, subs, twitter);
 							else
-								createPost(channel, subs, getTitle(channel));
-
-							props.setProperty(channel, subs);
+								success = createPost(channel, subs,
+										getTitle(channel));
+							if (success)
+								props.setProperty(channel, subs);
 							props.store(new FileOutputStream(new File(path)),
 									"");
 							return 0;
@@ -199,7 +201,7 @@ public class YouTube {
 		}
 	}
 
-	private void createPost(String username, String subs, String title) {
+	private boolean createPost(String username, String subs, String title) {
 		try {
 			System.out.println(username);
 			System.out.println(title);
@@ -214,9 +216,11 @@ public class YouTube {
 			Status status = twitter.updateStatus(statusUpdate);
 			log.info("Successfully updated the status to [" + status.getText()
 					+ "].");
+			return true;
 		} catch (TwitterException e) {
 			log.error("Error occured while creating Post");
 			log.logStackTrace(e);
+			return false;
 		}
 	}
 
