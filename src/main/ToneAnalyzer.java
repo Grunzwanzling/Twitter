@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -98,14 +99,16 @@ public class ToneAnalyzer {
 		twitter = factory.getInstance();
 		twitter.setOAuthAccessToken(accessToken);
 
-		int iterations = 5;
+		int iterations = 20;
 
-		List<Status> tweets = getTweets("#Hecking", 20 * iterations);
+		List<Status> tweets = getTweets("DDos", iterations);
+		System.out.println(tweets.size());
 		float[] scores = new float[13];
 		for (int i = 0; i < iterations; i++) {
-			System.out.println(i);
+			// System.out.println(i);
 			String text = "";
 			for (int e = i * 20; e < i * 20 + 20; e++) {
+				System.out.println(e);
 				text = text + tweets.get(e).getText();
 			}
 			float[] score = check(URLEncoder.encode(text));
@@ -118,7 +121,7 @@ public class ToneAnalyzer {
 			scores[u] = scores[u] / iterations;
 		}
 
-		System.out.println("#Hecking");
+		System.out.println("DDos");
 		for (int i : topFive(scores)) {
 			System.out.println(tone_ids[i] + " " + (int) (scores[i] * 100)
 					+ "%");
@@ -129,18 +132,26 @@ public class ToneAnalyzer {
 			throws TwitterException {
 		Query query = new Query(topic);
 		QueryResult result;
-		query.setCount(count);
+		query.setCount(20);
+		List<Status> stati = new ArrayList<Status>();
 		result = twitter.search(query);
+		stati = result.getTweets();
+		for (int i = 0; i < count - 1; i++) {
+			query = result.nextQuery();
+			result = twitter.search(query);
+			stati.addAll(result.getTweets());
+			System.out.println(stati.size());
+		}
 
-		return result.getTweets();
+		return stati;
 	}
 
 	private float[] check(String text) throws IOException {
 		float[] scores = new float[13];
 
 		// System.out.println(text);
-		System.out.println(text.length());
-		System.out.println(text);
+		// System.out.println(text.length());
+		// System.out.println(text);
 		scores = analyzeTone(text.replace("\n", ""));
 		// for (int i = statusList.size(); i >= 0; i--) {
 		// twitter.createFavorite(statusList.get(1).getId());
