@@ -15,3 +15,8 @@ A bot that would fav all tweets taged with #MeinErsterTweet
 A bot that generates a random image of a random letter every day and tweets it to [@Lett3rOfTheD4y](https://twitter.com/Lett3rOfTheD4y)
 
 All those accounts are powered by [@grunzwanzling42](https://twitter.com/grunzwanzling42)
+
+
+## Dependencies
+* [AnonymousPixels/Essentials](https://github.com/AnonymousPixels/Essentials)
+* [Twitter4j](twitter4j.org)
