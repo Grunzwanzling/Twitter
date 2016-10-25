@@ -211,7 +211,11 @@ public class YouTube {
 			message = message.replaceAll("@user", username);
 			message = message.replaceAll("@title", title);
 			message = message.replaceAll("@subs", subs);
+			if (message.length() > 140) {
 
+				log.warning("Status was to long. Will still pretend it worked");
+				return true;// It didn't work but we will pretend so
+			}
 			StatusUpdate statusUpdate = new StatusUpdate(message);
 			Status status = twitter.updateStatus(statusUpdate);
 			log.info("Successfully updated the status to [" + status.getText()

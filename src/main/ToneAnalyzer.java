@@ -101,7 +101,7 @@ public class ToneAnalyzer {
 
 		int iterations = 20;
 
-		List<Status> tweets = getTweets("DDos", iterations);
+		List<Status> tweets = getTweets("#Schäuble", iterations);
 		System.out.println(tweets.size());
 		float[] scores = new float[13];
 		for (int i = 0; i < iterations; i++) {
@@ -109,9 +109,11 @@ public class ToneAnalyzer {
 			String text = "";
 			for (int e = i * 20; e < i * 20 + 20; e++) {
 				System.out.println(e);
-				text = text + tweets.get(e).getText();
+				text = text + tweets.get(e).getText() + "\n";
+
 			}
 			float[] score = check(URLEncoder.encode(text));
+			System.out.println(URLEncoder.encode(text));
 			for (int u = 0; u < 13; u++) {
 				scores[u] += score[u];
 			}
