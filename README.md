@@ -20,3 +20,5 @@ All those accounts are powered by [@grunzwanzling42](https://twitter.com/grunzwa
 ## Dependencies
 * [AnonymousPixels/Essentials](https://github.com/AnonymousPixels/Essentials)
 * [Twitter4j](twitter4j.org)
+
+[Homepage of Grunzwanzling](https://grunzwanzling.github.io)
