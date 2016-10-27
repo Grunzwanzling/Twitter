@@ -32,6 +32,8 @@ public class ToneAnalyzer {
 			"analytical", "confiden", "tentative", "openness",
 			"conscientiousness", "extraversion", "agreeableness",
 			"emotional_range" };
+	String user;
+	String pass;
 
 	private int[] topFive(float[] array) {
 		float max1 = Float.MIN_VALUE;
@@ -96,6 +98,8 @@ public class ToneAnalyzer {
 	public ToneAnalyzer() throws TwitterException, IOException {
 		TwitterFactory factory = new TwitterFactory();
 		AccessToken accessToken = loadAccessToken("abos");
+		user = loadToken("ibm.user");
+		pass = loadToken("ibm.pass");
 		twitter = factory.getInstance();
 		twitter.setOAuthAccessToken(accessToken);
 
@@ -162,15 +166,14 @@ public class ToneAnalyzer {
 		return scores;
 	}
 
-	private static float[] analyzeTone(String message) throws IOException {
+	private float[] analyzeTone(String message) throws IOException {
 		URL url = new URL(
 				"https://gateway.watsonplatform.net/tone-analyzer/api/v3/tone/?version=2016-05-19&text="
 						+ message);
 		// params = URLEncoder.encode(params);
 		// params = "test";
 		try {
-			String result = Essentials.sendHTTPRequest(url,
-					"28d2ffc3-e805-470c-99f8-c4062ecb2569", "MGdeoIyimoVU");
+			String result = Essentials.sendHTTPRequest(url, user, pass);
 			float[] values = new float[13];
 			int start = 0;
 			System.out.println(result);
@@ -200,6 +203,22 @@ public class ToneAnalyzer {
 			String token = prop.getProperty(id + ".token");
 			String tokenSecret = prop.getProperty(id + ".tokenSecret");
 			return new AccessToken(token, tokenSecret);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static String loadToken(String id) {
+		Properties prop = new Properties();
+		InputStream in;
+		try {
+			in = new FileInputStream(new File("C://twitter//token.txt"));
+
+			prop.load(in);
+			String token = prop.getProperty(id);
+			return token;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -43,7 +43,7 @@ public class YouTube {
 	String congrats;
 	String tokenID;
 	String[] topURL;
-	String YouTubeAPIkey = "AIzaSyCJc0FXy-09W07N0OPlMiHezPsCdNrX0mY";
+	String YouTubeAPIkey;
 	String infoPath;
 	static long t;
 	static long i;
@@ -73,6 +73,7 @@ public class YouTube {
 		// Connecting to Twitter API
 		factory = new TwitterFactory();
 		accessToken = loadAccessToken(tokenID);
+		YouTubeAPIkey = loadToken("youtube");
 		twitter = factory.getInstance();
 		twitter.setOAuthAccessToken(accessToken);
 		log.info("Successfully loaded congratulations and connected to Twitter");
@@ -318,6 +319,22 @@ public class YouTube {
 			String token = prop.getProperty(id + ".token");
 			String tokenSecret = prop.getProperty(id + ".tokenSecret");
 			return new AccessToken(token, tokenSecret);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static String loadToken(String id) {
+		Properties prop = new Properties();
+		InputStream in;
+		try {
+			in = new FileInputStream(new File("C://twitter//token.txt"));
+
+			prop.load(in);
+			String token = prop.getProperty(id);
+			return token;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
