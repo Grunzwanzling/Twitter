@@ -33,7 +33,7 @@ import essentials.Essentials;
 import essentials.SimpleLog;
 
 /**
- * @author <a href="https://grunzwanzling.github.io">Maximilian von Gaisberg
+ * @author <a href="http://grunzwanzling.me">Maximilian von Gaisberg
  *         (Grunzwanzling)</a>
  *
  */
