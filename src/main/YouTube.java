@@ -33,7 +33,8 @@ import essentials.Essentials;
 import essentials.SimpleLog;
 
 /**
- * @author Maximilian
+ * @author <a href="https://grunzwanzling.github.io">Maximilian von Gaisberg
+ *         (Grunzwanzling)</a>
  *
  */
 public class YouTube {
