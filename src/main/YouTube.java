@@ -3,7 +3,6 @@
  */
 package main;
 
-import java.awt.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -389,19 +388,21 @@ public class YouTube {
 		while (true) {
 			Date d = new Date();
 			if (dateFormat.format(d).endsWith("0")) {
-
+				boolean sleep = false;
 				int returnValue;
 				returnValue = yt.check();
 				if (returnValue == 0)
-					Thread.sleep(1200000);
+					sleep = true;
 				else
 					yt.updateProfile(returnValue);
 
 				returnValue = yt2.check();
 				if (returnValue == 0)
-					Thread.sleep(1200000);
+					sleep = true;
 				else
 					yt2.updateProfile(returnValue);
+				if (sleep)
+					Thread.sleep(1200000);
 				Thread.sleep(61000);
 			}
 
