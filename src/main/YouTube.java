@@ -350,10 +350,10 @@ public class YouTube {
 			if (result.indexOf("twitter.com/") == -1)
 				return null;
 
-			return "@"
-					+ result.substring(result.indexOf("twitter.com/") + 12,
-							result.indexOf("\"",
-									result.indexOf("twitter.com/") + 12));
+			String name = result.substring(result.indexOf("twitter.com/") + 12,
+					result.indexOf("\"", result.indexOf("twitter.com/") + 12));
+			name = name.replace("#!/", "");
+			return "@" + name;
 		} catch (IOException e) {
 			log.error("Error occured while getting the Twitter name of "
 					+ username);
@@ -402,7 +402,7 @@ public class YouTube {
 				else
 					yt2.updateProfile(returnValue);
 				if (sleep)
-					Thread.sleep(1200000);
+					Thread.sleep(1800000);
 				Thread.sleep(61000);
 			}
 
