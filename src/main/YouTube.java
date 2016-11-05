@@ -106,7 +106,6 @@ public class YouTube {
 		for (Object object : s) {
 			list.add((String) object);
 		}
-		long time = System.currentTimeMillis();
 		for (String path : paths) {
 			int size = 100;
 			if (path.contains("500"))
@@ -118,7 +117,6 @@ public class YouTube {
 						list.add(string);
 				}
 		}
-		System.out.println(System.currentTimeMillis() - time);
 
 		return list;
 	}
@@ -168,9 +166,6 @@ public class YouTube {
 				} catch (NumberFormatException e) {
 					log.warning("Couldn't find " + channel);
 				}
-				// else
-				// System.out.println(string + " still has "
-				// + round(getSubs(string)));
 
 			}
 			props.store(new FileOutputStream(new File(path)), "");
@@ -188,7 +183,6 @@ public class YouTube {
 
 	private static String round(String subs) {
 		try {
-			// System.out.println(subs);
 			int sub = Integer.parseInt(subs);
 			int down = sub / 100000;
 			if (sub > 3000000) {
@@ -204,8 +198,6 @@ public class YouTube {
 
 	private boolean createPost(String username, String subs, String title) {
 		try {
-			System.out.println(username);
-			System.out.println(title);
 			// Generate the message
 			int index = new Random().nextInt(congratulations.length);
 			String message = congratulations[index];
