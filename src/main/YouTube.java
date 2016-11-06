@@ -134,8 +134,10 @@ public class YouTube {
 			}
 			Properties props = new Properties();
 			props.load(new FileInputStream(new File(path)));
-			a: for (String channel : channels) {
+			for (String channel : channels) {
 				String subs = round(getSubs(channel));
+				if (subs == null)
+					break;
 				Thread.sleep(20);
 				if (!props.containsKey(channel)) {
 					log.info("Found a new channel \"" + channel + "\"");
@@ -182,6 +184,8 @@ public class YouTube {
 	}
 
 	private static String round(String subs) {
+		if (subs == null)
+			return null;
 		try {
 			int sub = Integer.parseInt(subs);
 			int down = sub / 100000;
