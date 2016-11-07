@@ -136,8 +136,11 @@ public class YouTube {
 			props.load(new FileInputStream(new File(path)));
 			for (String channel : channels) {
 				String subs = round(getSubs(channel));
-				if (subs == null)
+				if (subs == null) {
+
+					log.error("No internet connection. Skipping this check");
 					break;
+				}
 				Thread.sleep(20);
 				if (!props.containsKey(channel)) {
 					log.info("Found a new channel \"" + channel + "\"");
@@ -280,8 +283,7 @@ public class YouTube {
 						result.indexOf("\"",
 								result.indexOf("subscriberCount") + 19));
 			} catch (MalformedURLException e) {
-				// ignore this shit
-				return null;
+				return "0";
 			}
 		} catch (IOException e) {
 			log.error("Error occured while getting subscribers of " + username);
