@@ -345,19 +345,15 @@ public class YouTube {
 
 		try {
 
-			int followerCount = twitter.getFollowersIDs(
-					twitter.getScreenName(), -1).getIDs().length;
-
 			if (new File(path).exists())
 				props.load(new FileInputStream(new File(path)));
 			if (channelCount != 0)
 				props.setProperty("channelCount", String.valueOf(channelCount));
-			props.setProperty("followerCount", String.valueOf(followerCount));
 			props.setProperty("timestamp",
 					String.valueOf(System.currentTimeMillis()));
 			props.store(new FileOutputStream(new File(path)),
 					"The status report for " + name);
-		} catch (IOException | IllegalStateException | TwitterException e) {
+		} catch (IOException | IllegalStateException e) {
 			log.logStackTrace(e);
 		}
 
@@ -448,7 +444,6 @@ public class YouTube {
 				notBefore = System.currentTimeMillis() + 120000;
 			}
 			if (System.currentTimeMillis() > doNotReportBefore) {
-
 				yt.reportStatus("C:\\twitter\\Aboerfolge\\report.txt",
 						channelCount);
 				yt2.reportStatus("C:\\twitter\\Aboerfolge\\report2.txt",
