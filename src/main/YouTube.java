@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 
+import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
@@ -340,6 +341,32 @@ public class YouTube {
 		return null;
 	}
 
+	private void reportStatus(String path, int channelCount) {
+		Properties props = new Properties();
+
+		try {
+
+			int followerCount = twitter.getFollowersIDs(
+					twitter.getScreenName(), -1).getIDs().length;
+			int tweetCount = twitter.getUserTimeline(twitter.getScreenName(),
+					new Paging(1, 100)).size();
+			if (new File(path).exists())
+				props.load(new FileInputStream(new File(path)));
+
+			props.setProperty("tweetCount", String.valueOf(tweetCount));
+			if (channelCount != 0)
+				props.setProperty("channelCount", String.valueOf(channelCount));
+			props.setProperty("followerCount", String.valueOf(followerCount));
+			props.setProperty("timestamp",
+					String.valueOf(System.currentTimeMillis()));
+			props.store(new FileOutputStream(new File(path)),
+					"The status report for " + name);
+		} catch (IOException | IllegalStateException | TwitterException e) {
+			log.logStackTrace(e);
+		}
+
+	}
+
 	private String getTwitterName(String username) {
 		try {
 
@@ -351,6 +378,7 @@ public class YouTube {
 			String name = result.substring(result.indexOf("twitter.com/") + 12,
 					result.indexOf("\"", result.indexOf("twitter.com/") + 12));
 			name = name.replace("#!/", "");
+			name = name.replace("/", "");
 			return "@" + name;
 		} catch (IOException e) {
 			log.error("Error occured while getting the Twitter name of "
@@ -382,26 +410,44 @@ public class YouTube {
 				"SubcounterINT",
 				"C:\\twitter\\Aboerfolge\\congratulationsEN.txt", "abo2",
 				yt2top, "C:\\twitter\\Aboerfolge\\info2.properties", log);
-
+		long notBefore = 0;
+		long doNotReportBefore = 0;
+		int channelCount = 0;
+		int channelCount2 = 0;
 		while (true) {
+			Thread.sleep(1000);
+			if (System.currentTimeMillis() > doNotReportBefore) {
+
+				yt.reportStatus("C:\\twitter\\Aboerfolge\\report.txt",
+						channelCount);
+				yt2.reportStatus("C:\\twitter\\Aboerfolge\\report2.txt",
+						channelCount2);
+
+				doNotReportBefore = System.currentTimeMillis() + 60000;
+			}
 			Date d = new Date();
-			if (dateFormat.format(d).endsWith("0")) {
+			if (dateFormat.format(d).endsWith("0")
+					&& System.currentTimeMillis() > notBefore) {
 				boolean sleep = false;
 				int returnValue;
 				returnValue = yt.check();
 				if (returnValue == 0)
 					sleep = true;
-				else
+				else {
+					channelCount = returnValue;
 					yt.updateProfile(returnValue);
+				}
 
 				returnValue = yt2.check();
 				if (returnValue == 0)
 					sleep = true;
-				else
+				else {
+					channelCount2 = returnValue;
 					yt2.updateProfile(returnValue);
+				}
 				if (sleep)
-					Thread.sleep(1800000);
-				Thread.sleep(61000);
+					notBefore = System.currentTimeMillis() + 1800000;
+				notBefore = System.currentTimeMillis() + 61000;
 			}
 
 		}

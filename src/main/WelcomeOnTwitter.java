@@ -5,11 +5,14 @@ package main;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import twitter4j.Query;
+import twitter4j.Query.ResultType;
 import twitter4j.QueryResult;
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -31,7 +34,8 @@ public class WelcomeOnTwitter {
 
 	Twitter twitter;
 
-	public WelcomeOnTwitter() throws TwitterException {
+	public WelcomeOnTwitter() throws TwitterException, FileNotFoundException,
+			IOException {
 		TwitterFactory factory = new TwitterFactory();
 		AccessToken accessToken = loadAccessToken("abos");
 		twitter = factory.getInstance();
@@ -39,38 +43,39 @@ public class WelcomeOnTwitter {
 		check();
 	}
 
-	private void check() {
+	private void check() throws FileNotFoundException, IOException {
+		Properties props = new Properties();
+		props.load(new FileInputStream(new File(
+				"C://twitter//sarcasm.properties")));
 		try {
 			Query query = new Query("#sarcasm");
 			QueryResult result;
 			query.setCount(100);
-
+			query.setResultType(query.POPULAR);
 			result = twitter.search(query);
-
-			for (Status status : result.getTweets()) {
-				String text = status.getText();
-				text = text.replace("\n", "");
-				text = text.replace("\r", "");
-				text = text.replace(";", "");
-				text = text.replace("#sarcasm", "");
-				text = text.replace("#Sarcasm", "");
-				Essentials.printStringToFile(text + "\n", new File(
-						"C://twitter//sarcasm.csv"));
-			}
-			while (result.hasNext())// there is more pages to load
-			{
+			int count = 0;
+			// there is more pages to load
+			do {
 				System.out.println("Check");
-				query = result.nextQuery();
-				result = twitter.search(query);
+
 				for (Status status : result.getTweets()) {
+					count++;
+
 					String text = status.getText();
 					text = text.replaceAll("/\r?\n|\r/g", " ");
-					text = text.replace(";", " ");
 					text = text.replace("#sarcasm", "");
-					Essentials.printStringToFile(text + "\n", new File(
-							"C://twitter//sarcasm.csv"));
+					if (!props.containsKey(String.valueOf(status.getId()))) {
+						props.put(String.valueOf(status.getId()), text);
+						System.out.print("Tweets No. " + count + ": " + text);
+					}
+					System.out.println("Double tweet skipped");
 				}
-			}
+				if (result.hasNext())
+					query = result.nextQuery();
+			} while (result.hasNext());
+			props.store(new FileOutputStream(new File(
+					"C://twitter//sarcasm.properties")),
+					"Search results for #sarcasm");
 
 			// for (int i = statusList.size(); i >= 0; i--) {
 			// twitter.createFavorite(statusList.get(1).getId());
@@ -146,10 +151,13 @@ public class WelcomeOnTwitter {
 	/**
 	 * @param args
 	 * @throws TwitterException
+	 * @throws IOException
+	 * @throws FileNotFoundException
 	 */
-	public static void main(String[] args) throws TwitterException {
-		stream();
-		// new WelcomeOnTwitter();
+	public static void main(String[] args) throws TwitterException,
+			FileNotFoundException, IOException {
+		// stream();
+		new WelcomeOnTwitter();
 	}
 
 }
