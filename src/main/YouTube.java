@@ -22,7 +22,6 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 
-import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
@@ -348,12 +347,9 @@ public class YouTube {
 
 			int followerCount = twitter.getFollowersIDs(
 					twitter.getScreenName(), -1).getIDs().length;
-			int tweetCount = twitter.getUserTimeline(twitter.getScreenName(),
-					new Paging(1, 100)).size();
+
 			if (new File(path).exists())
 				props.load(new FileInputStream(new File(path)));
-
-			props.setProperty("tweetCount", String.valueOf(tweetCount));
 			if (channelCount != 0)
 				props.setProperty("channelCount", String.valueOf(channelCount));
 			props.setProperty("followerCount", String.valueOf(followerCount));
@@ -391,8 +387,12 @@ public class YouTube {
 	/**
 	 * @param args
 	 * @throws InterruptedException
+	 * @throws IOException
+	 * @throws MalformedURLException
 	 */
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException,
+			MalformedURLException, IOException {
+
 		SimpleLog log = new SimpleLog(new File(
 				"C://twitter//Aboerfolge//log.txt"), true, true);
 		log.startupMessage("Starting Aboerfolg-Bot...");
@@ -410,21 +410,19 @@ public class YouTube {
 				"SubcounterINT",
 				"C:\\twitter\\Aboerfolge\\congratulationsEN.txt", "abo2",
 				yt2top, "C:\\twitter\\Aboerfolge\\info2.properties", log);
+
+		// ArrayList<String> list = yt.getChannelsToCheck(yt1top);
+		// for (String string : list) {
+		// System.out.println(string);
+		// }
+
 		long notBefore = 0;
 		long doNotReportBefore = 0;
 		int channelCount = 0;
 		int channelCount2 = 0;
 		while (true) {
 			Thread.sleep(1000);
-			if (System.currentTimeMillis() > doNotReportBefore) {
 
-				yt.reportStatus("C:\\twitter\\Aboerfolge\\report.txt",
-						channelCount);
-				yt2.reportStatus("C:\\twitter\\Aboerfolge\\report2.txt",
-						channelCount2);
-
-				doNotReportBefore = System.currentTimeMillis() + 60000;
-			}
 			Date d = new Date();
 			if (dateFormat.format(d).endsWith("0")
 					&& System.currentTimeMillis() > notBefore) {
@@ -447,9 +445,17 @@ public class YouTube {
 				}
 				if (sleep)
 					notBefore = System.currentTimeMillis() + 1800000;
-				notBefore = System.currentTimeMillis() + 61000;
+				notBefore = System.currentTimeMillis() + 120000;
 			}
+			if (System.currentTimeMillis() > doNotReportBefore) {
 
+				yt.reportStatus("C:\\twitter\\Aboerfolge\\report.txt",
+						channelCount);
+				yt2.reportStatus("C:\\twitter\\Aboerfolge\\report2.txt",
+						channelCount2);
+
+				doNotReportBefore = System.currentTimeMillis() + 60000;
+			}
 		}
 	}
 }
