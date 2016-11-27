@@ -216,6 +216,7 @@ public class YouTube {
 				log.warning("Status was to long. Will still pretend it worked");
 				return true;// It didn't work but we will pretend so
 			}
+			System.out.println(message);
 			StatusUpdate statusUpdate = new StatusUpdate(message);
 			Status status = twitter.updateStatus(statusUpdate);
 			log.info("Successfully updated the status to [" + status.getText()
@@ -223,6 +224,7 @@ public class YouTube {
 			return true;
 		} catch (TwitterException e) {
 			log.error("Error occured while creating Post");
+
 			log.logStackTrace(e);
 			return false;
 		}
@@ -393,6 +395,7 @@ public class YouTube {
 				"C://twitter//Aboerfolge//log.txt"), true, true);
 		log.startupMessage("Starting Aboerfolg-Bot...");
 		String[] yt1top = {
+				"http://socialblade.com/youtube/top/country/de/mostviewed",
 				"http://socialblade.com/youtube/top/country/de/mostsubscribed",
 				"http://socialblade.com/youtube/top/country/de" };
 		String[] yt2top = {
@@ -417,39 +420,40 @@ public class YouTube {
 		int channelCount = 0;
 		int channelCount2 = 0;
 		while (true) {
-			Thread.sleep(1000);
+			Thread.sleep(30000);
 
 			Date d = new Date();
-			if (dateFormat.format(d).endsWith("0")
-					&& System.currentTimeMillis() > notBefore) {
-				boolean sleep = false;
-				int returnValue;
-				returnValue = yt.check();
-				if (returnValue == 0)
-					sleep = true;
-				else {
-					channelCount = returnValue;
-					yt.updateProfile(returnValue);
-				}
+			if (dateFormat.format(d).endsWith("0")) {
+				System.out.println(notBefore);
+				if (System.currentTimeMillis() > notBefore) {
+					boolean sleep = false;
+					int returnValue;
+					returnValue = yt.check();
+					if (returnValue == 0)
+						sleep = true;
+					else {
+						channelCount = returnValue;
+						yt.updateProfile(returnValue);
+					}
 
-				returnValue = yt2.check();
-				if (returnValue == 0)
-					sleep = true;
-				else {
-					channelCount2 = returnValue;
-					yt2.updateProfile(returnValue);
-				}
-				if (sleep)
+					returnValue = yt2.check();
+					if (returnValue == 0)
+						sleep = true;
+					else {
+						channelCount2 = returnValue;
+						yt2.updateProfile(returnValue);
+					}
+					if (sleep)
+						System.out.println("Sleeping");
 					notBefore = System.currentTimeMillis() + 1800000;
-				notBefore = System.currentTimeMillis() + 120000;
+				}
 			}
 			if (System.currentTimeMillis() > doNotReportBefore) {
-				yt.reportStatus("C:\\twitter\\Aboerfolge\\report.txt",
-						channelCount);
-				yt2.reportStatus("C:\\twitter\\Aboerfolge\\report2.txt",
+				yt.reportStatus("C:\\xampp\\htdocs\\report.txt", channelCount);
+				yt2.reportStatus("C:\\xampp\\htdocs\\report2.txt",
 						channelCount2);
 
-				doNotReportBefore = System.currentTimeMillis() + 60000;
+				doNotReportBefore = System.currentTimeMillis() + 10000;
 			}
 		}
 	}
