@@ -313,7 +313,7 @@ public class YouTube {
 		Properties prop = new Properties();
 		InputStream in;
 		try {
-			in = new FileInputStream(new File("C://twitter//token.txt"));
+			in = new FileInputStream(new File("token.txt"));
 
 			prop.load(in);
 			String token = prop.getProperty(id + ".token");
@@ -330,7 +330,7 @@ public class YouTube {
 		Properties prop = new Properties();
 		InputStream in;
 		try {
-			in = new FileInputStream(new File("C://twitter//token.txt"));
+			in = new FileInputStream(new File("token.txt"));
 
 			prop.load(in);
 			String token = prop.getProperty(id);
@@ -391,8 +391,7 @@ public class YouTube {
 	public static void main(String[] args) throws InterruptedException,
 			MalformedURLException, IOException {
 
-		SimpleLog log = new SimpleLog(new File(
-				"C://twitter//Aboerfolge//log.txt"), true, true);
+		SimpleLog log = new SimpleLog(new File("log.txt"), true, true);
 		log.startupMessage("Starting Aboerfolg-Bot...");
 		String[] yt1top = {
 				"http://socialblade.com/youtube/top/country/de/mostviewed",
@@ -402,13 +401,11 @@ public class YouTube {
 				"http://socialblade.com/youtube/top/500/mostsubscribed",
 				"http://socialblade.com/youtube/top/500",
 				"http://socialblade.com/youtube/top/5001d" };
-		YouTube yt = new YouTube("C:\\twitter\\Aboerfolge\\subs.properties",
-				"AboerfolgeDE", "C:\\twitter\\Aboerfolge\\congratulations.txt",
-				"abos", yt1top, "C:\\twitter\\Aboerfolge\\info.properties", log);
-		YouTube yt2 = new YouTube("C:\\twitter\\Aboerfolge\\subs2.properties",
-				"SubcounterINT",
-				"C:\\twitter\\Aboerfolge\\congratulationsEN.txt", "abo2",
-				yt2top, "C:\\twitter\\Aboerfolge\\info2.properties", log);
+		YouTube yt = new YouTube("subs.properties", "AboerfolgeDE",
+				"congratulations.txt", "abos", yt1top, "info.properties", log);
+		YouTube yt2 = new YouTube("subs2.properties", "SubcounterINT",
+				"congratulationsEN.txt", "abo2", yt2top, "info2.properties",
+				log);
 
 		// ArrayList<String> list = yt.getChannelsToCheck(yt1top);
 		// for (String string : list) {
@@ -449,9 +446,8 @@ public class YouTube {
 				}
 			}
 			if (System.currentTimeMillis() > doNotReportBefore) {
-				yt.reportStatus("C:\\xampp\\htdocs\\report.txt", channelCount);
-				yt2.reportStatus("C:\\xampp\\htdocs\\report2.txt",
-						channelCount2);
+				yt.reportStatus("/var/www/report.txt", channelCount);
+				yt2.reportStatus("/var/www/report2.txt", channelCount2);
 
 				doNotReportBefore = System.currentTimeMillis() + 10000;
 			}
